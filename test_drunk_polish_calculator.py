@@ -3,7 +3,7 @@ import pytest
 
 
 @pytest.mark.parametrize(
-    "x, y, expec_result", [(2, 2, 4), (5, 0, 5), (5, -3, 2), (3.2, 7, 10.2)]
+    "x, y, expec_result", [(2, 2, 4), (5, -3, 2), (3.2, 7, 10.2), (-3, -2, -5)]
 )
 def test_op_plus(x, y, expec_result):
     assert op_plus(x, y) == expec_result
@@ -19,7 +19,7 @@ def test_op_plus_error(x, y, expec_exception):
 
 
 @pytest.mark.parametrize(
-    "x, y, expec_result", [(2, 3, -1), (5, 3, 2), (5, -3, 8), (3, 2.8, 0.2)]
+    "x, y, expec_result", [(2, 3, -1), (5, -3, 8), (3, 2.8, 0.2), (-4, -2, -2)]
 )
 def test_op_minus(x, y, expec_result):
     assert op_minus(x, y) == expec_result
@@ -35,7 +35,7 @@ def test_op_minus_error(x, y, expec_exception):
 
 
 @pytest.mark.parametrize(
-    "x, y, expec_result", [(2, 3, 6), (5, 0, 0), (5, -3, -15), (1, 7, 7), (10, 0.3, 3)]
+    "x, y, expec_result", [(2, 3, 6), (5, -3, -15), (1, 7, 7), (10, 0.3, 3), (-2, -2, 4)]
 )
 def test_op_multiply(x, y, expec_result):
     assert op_multiply(x, y) == expec_result
@@ -52,7 +52,7 @@ def test_op_multiply_error(x, y, expec_exception):
 
 @pytest.mark.parametrize(
     "x, y, expec_result",
-    [(2, 3, 6), (0, 5, 0), (5, -3, -15), (1, 7, 7), (10, 0.5, 20.0)],
+    [(6, 2, 3), (0, 5, 0), (5, -3, -15), (-7, -1, 7), (10, 0.5, 20.0)],
 )
 def test_op_divide(x, y, expec_result):
     assert op_divide(x, y) == expec_result
