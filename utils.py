@@ -51,6 +51,9 @@ def get_currency_exchange_rate(currency_a: str,
 
 
 def find_delimiter(date: str) -> str:
+    '''
+    Знаходить роздільних, який між ріком, місяцем та днем
+    '''
     if date[2] == date[-5]:
         return date[2]
     else:
@@ -58,6 +61,9 @@ def find_delimiter(date: str) -> str:
 
 
 def check_date(rate_date: str) -> str:
+    '''
+    Перебирає формати дати та повертає оброблену дату у потрібному форматі
+    '''
     delim = find_delimiter(rate_date)
 
     formats = ( '%Y' + delim + '%m' + delim + '%d', 
