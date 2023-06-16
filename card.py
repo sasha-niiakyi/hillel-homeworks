@@ -1,6 +1,3 @@
-from card_repository import CardRepository
-
-
 class Card:
 
     def __init__(self, number: int, expir_date: str, cvv: int,
@@ -13,14 +10,20 @@ class Card:
         self.__status = status
 
 
+    def number(self) -> int:
+        return self.__number
+
+
+    @property
     def status(self) -> str:
         return self.__status
 
 
+    @status.setter
     def status(self, new_status: str) -> str:
         values = ('new', 'active', 'blocked')
 
-        if self.new_status not in values:
+        if new_status not in values:
             return 'Value entered incorrectly'
 
         elif self.__status == 'blocked':
@@ -31,14 +34,13 @@ class Card:
             return new_status
 
 
-    def attributs(self) -> tuple:
+    def attributes(self) -> tuple:
         return (self.__number,
                 self.__expir_date,
                 self.__cvv,
                 self.__date_of_issue,
                 self.__user_id,
                 self.__status)
-        
 
 
 if __name__ == '__main__':
