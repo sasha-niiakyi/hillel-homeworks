@@ -1,6 +1,7 @@
 from config import host, user, pwd, db_name
 from card import Card
 from uuid import uuid4
+
 import psycopg2
 
 
@@ -11,7 +12,7 @@ class CardRepository:
 		return date[3:] + '-' + date[:2] + '-01' 
 
 
-	def __init__(self):
+	def __init__(self, host: str, user: str, pwd: str, db_name: str):
 		try:
 			self.con = psycopg2.connect(host=host, user=user, password=pwd, database=db_name)
 			self.con.autocommit = True
@@ -52,16 +53,16 @@ class CardRepository:
 
 
 if __name__ == '__main__':
+	...
+	# rep = CardRepository(host, user, pwd, db_name)
+	# card1 = Card(1234_5678_9012_3456, '11/2024', 123, '2023-11-10', str(uuid4()), 'active')
 
-	rep = CardRepository()
-	card1 = Card(1234_5678_9012_3456, '11/2024', 123, '2023-11-10', str(uuid4()), 'active')
+	# rep.save(card1)
+	# print(rep.get(1234_5678_9012_3456))
 
-	rep.save(card1)
-	print(rep.get(1234_5678_9012_3456))
+	# card1.status = 'blocked'
+	# rep.update_status(card1)
+	# print(rep.get(1234_5678_9012_3456))
 
-	card1.status = 'blocked'
-	rep.update_status(card1)
-	print(rep.get(1234_5678_9012_3456))
-
-	print(rep.find_by_expir_date('11/2024'))
-	print('Good!')
+	# print(rep.find_by_expir_date('11/2024'))
+	# print('Good!')

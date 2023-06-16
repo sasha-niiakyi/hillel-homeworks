@@ -20,18 +20,17 @@ class Card:
 
 
     @status.setter
-    def status(self, new_status: str) -> str:
+    def status(self, new_status: str):
         values = ('new', 'active', 'blocked')
 
         if new_status not in values:
-            return 'Value entered incorrectly'
+            raise ValueError('Value entered incorrectly')
 
         elif self.__status == 'blocked':
-            return 'A blocked card cannot be activated'
+            raise AssertionError('A blocked card cannot be activated')
 
         else:
             self.__status = new_status
-            return new_status
 
 
     def attributes(self) -> tuple:
