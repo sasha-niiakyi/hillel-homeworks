@@ -52,6 +52,11 @@ class CardRepository:
 		return self.cur.fetchall()
 
 
+	def unconnect(self):
+		self.cur.close()
+		self.con.close()
+
+
 if __name__ == '__main__':
 	...
 	# rep = CardRepository(host, user, pwd, db_name)
@@ -65,4 +70,5 @@ if __name__ == '__main__':
 	# print(rep.get(1234_5678_9012_3456))
 
 	# print(rep.find_by_expir_date('11/2024'))
+	# rep.unconnect()
 	# print('Good!')
