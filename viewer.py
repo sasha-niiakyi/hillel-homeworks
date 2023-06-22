@@ -8,7 +8,8 @@ app = Flask('app')
 
 @app.route('/')
 def home():
-    return '<h1>Hello</h1>'
+    return '''<h1><a href='http://127.0.0.1:5000/create'>Create</a></h1>
+              <h1><a href='http://127.0.0.1:5000/show?number=0'>Show</a></h1>'''
 
 
 #всі перевірки не повні, роозумію
@@ -20,6 +21,9 @@ def check_number(number: str) -> bool:
 
 
 def check_expir_date(expir_date: str) -> bool:
+    if len(expir_date) != 7:
+        return True
+
     fist_part = expir_date[:2]
     last_part = expir_date[3:]
     delim = expir_date[2]
@@ -62,6 +66,7 @@ def check_user_id(user_id):
 def create():
     error = ''
     if request.method == 'POST':
+
         if check_number(number := request.form['number']):
             error = 'Невірний номер'
 
@@ -78,12 +83,18 @@ def create():
             error = 'Невірний айді юзера'
 
         else:
-            error = 'Все добре'
-            #number: int, expir_date: str, cvv: int, date_of_issue: str, user_id: str, status: str
             card1 = Card(int(number), expir_date, int(cvv), date_of_issue, user_id, 'new')
-            rep = CardRepository(host, user, pwd, db_name)
-            rep.save(card1)
-            rep.unconnect
+
+            try:
+                rep = CardRepository(host, user, pwd, db_name)
+                rep.save(card1)
+                error = 'Все добре'
+
+            except:
+                error = 'Така картка вже є'
+
+            finally:
+                rep.unconnect
     else:
         pass
 
@@ -96,6 +107,7 @@ def show():
 
     if check_number(number):
         result = 'Невірні вхідні данні'
+
     else:
         rep = CardRepository(host, user, pwd, db_name)
         result = rep.get(int(number))
