@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>{{title}}</title>
+		<style>
+			body {
+				background: #536872;
+				font-size: 30px;
+				color: #ffffff;
+			}
+
+			span {
+				font-family: Arial;
+				display: inline-block;
+				width: 250px;
+			}
+
+			input {
+				height: 30px;
+				width: 500px;
+			}
+
+			button {
+				height: 50px;
+				width: 300px;
+				margin-left: 250px;
+				font-size: 30px;
+			}
+
+			.error {
+				color: red;
+			}
+		</style>
+	</head>
+
+	<body>
+		<form action="/create" method='post'>
+			<p>
+				<span>Номер картки:</span>
+				<input placeholder="1111222233334444" type='text' name='number' value="">
+			</p>
+			<p>
+				<span>Закінчення сроку:</span>
+				<input placeholder="місяць/рік (11/2023)" type='text' name='expir_date' value="">
+			</p>
+			<p>
+				<span>CVV код:</span>
+				<input placeholder="123" type='text' name='cvv' value="">
+			</p>
+			<p>
+				<span>Дата видачі:</span>
+				<input placeholder="2023-11-23" type='text' name='date_of_issue' value=""></p>
+			<p>
+				<span>id власника:</span>
+				<input placeholder="UUID" type='text' name='user_id' value="">
+			</p>
+			<button type="submit">Створити</button>
+			<p class="error">{{error}}</p>
+		</form>
+	</body>
+</html>
