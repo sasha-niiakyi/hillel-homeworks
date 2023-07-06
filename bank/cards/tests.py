@@ -14,7 +14,6 @@ class CardsTest(TestCase):
 
 		# when
 		response = self.client.get(url).json()
-		print(card.date_of_issue)
 
 		# then
 		self.assertEquals(response, {'card': {'number': card.number,
@@ -26,6 +25,7 @@ class CardsTest(TestCase):
 
 
 	def test_post_card(self):
+		# given
 		data = json.dumps({
 							"number": 1111222233334455,
 							"expir_date": "2025-11-01",
@@ -33,10 +33,19 @@ class CardsTest(TestCase):
 						})
 
 		url = reverse('card')
+
+		# when
 		response = self.client.post(url, data=data, content_type='application/json')
 
-		self.assertEqual(response.status_code, 200)
-		self.assertEqual(response.json()['number'], 1111222233334455)
+		card = Card.objects.filter(number=1111222233334455)[0]
+
+		# then
+		self.assertEquals(response.json(), {'card': {'number': card.number,
+		                                      'expir_date': str(card.expir_date),
+		                                      'cvv': card.cvv,
+		                                      'date_of_issue': str(card.date_of_issue), 
+		                                      'user_id': str(card.user_id),
+		                                      'status': card.status}})
 
 
 	def test_is_valid_false(self):
