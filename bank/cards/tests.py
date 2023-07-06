@@ -1,6 +1,7 @@
 from django.test import TestCase
 from cards.models import Card
 from django.urls import reverse
+import json
 
 
 class CardsTest(TestCase):
@@ -22,6 +23,20 @@ class CardsTest(TestCase):
                                       'date_of_issue': str(card.date_of_issue), 
                                       'user_id': str(card.user_id),
                                       'status': card.status}})
+
+
+	def test_post_card(self):
+		data = json.dumps({
+							"number": 1111222233334455,
+							"expir_date": "2025-11-01",
+							"cvv": 123
+						})
+
+		url = reverse('card')
+		response = self.client.post(url, data=data, content_type='application/json')
+
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.json()['number'], 1111222233334455)
 
 
 	def test_is_valid_false(self):
