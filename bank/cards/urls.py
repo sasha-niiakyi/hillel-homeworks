@@ -1,8 +1,10 @@
 from django.urls import path
 
-from cards.views import CardsView
+from cards.views import createview, showview, homeview
 
 
 urlpatterns = [
-	path('card/', CardsView.as_view(http_method_names=['get', 'post']) , name='card')
+	path('create/',  createview, name='create_card'),
+	path('show/', showview, name='show_card'),
+	path('', homeview, name='home_card'),
 ]

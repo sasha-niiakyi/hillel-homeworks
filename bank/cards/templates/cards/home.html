@@ -1,0 +1,13 @@
+{% extends 'cards/base.html' %}
+{% block content %}
+
+<div class="links">
+	<p class='forwarding'>
+		<a href="{% url 'create_card' %}">Створити картку</a>
+	</p>
+	<p class='forwarding'>
+		<a href="{% url 'show_card' %}">Дивитися картку</a>
+	</p>
+</div>
+
+{% endblock content %}

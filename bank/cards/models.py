@@ -21,3 +21,6 @@ class Card(models.Model):
 
         return (summ + int(number_str[-1])) % 10 == 0
 
+
+    def __str__(self):
+        return f'Card: {self.number}'

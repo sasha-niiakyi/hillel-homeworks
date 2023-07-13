@@ -1,0 +1,39 @@
+{% extends 'cards/base.html' %}
+{% block form %}
+
+<form action="{% url 'create_card' %}" method="post">
+	<p>
+		<span>Номер картки:</span>
+		<input placeholder="1111222233334444" type='text' name='number' value="">
+	</p>
+	<p>
+		<span>Закінчення сроку:</span>
+		<input placeholder="2025-10-01" type='text' name='expir_date' value="">
+	</p>
+	<p>
+		<span>CVV код:</span>
+		<input placeholder="123" type='text' name='cvv' value="">
+	</p>
+	<!-- <p>
+		<span>Дата видачі:</span>
+		<input placeholder="2023-11-23" type='text' name='date_of_issue' value=""></p>
+	<p>
+		<span>id власника:</span>
+		<input placeholder="UUID" type='text' name='user_id' value="">
+	</p> -->
+	<button type="submit">Створити</button>
+</form>
+
+{% endblock form %}
+
+{% block content %}
+
+{% if check %}
+	<div class="error">
+		<p class="not_find">
+			<span class="text_error">Щось пішло не так</span>
+		</p>
+	</div>
+{% endif %}
+
+{% endblock content %}

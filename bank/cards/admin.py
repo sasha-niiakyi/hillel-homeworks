@@ -1,3 +1,10 @@
 from django.contrib import admin
+from .models import Card
 
-# Register your models here.
+
+class CardAdmin(admin.ModelAdmin):
+	list_display = ('number', 'date_of_issue', 'expir_date', 'status')
+	list_filter = ('date_of_issue', 'expir_date', 'status')
+
+
+admin.site.register(Card, CardAdmin)
