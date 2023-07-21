@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Card
+from .models import Card, Status
 
 
 class CardAdmin(admin.ModelAdmin):
@@ -8,3 +8,4 @@ class CardAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Card, CardAdmin)
+admin.site.register(Status)

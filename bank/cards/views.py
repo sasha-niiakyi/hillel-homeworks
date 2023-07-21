@@ -1,7 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
-from .models import Card
-from .models import Status
+from .models import Card, Status
 from .serializers import CardSerializer, CardSerializerUpdate
 from rest_framework.decorators import action
 
