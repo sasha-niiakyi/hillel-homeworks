@@ -12,7 +12,7 @@ class Card(models.Model):
     cvv = models.IntegerField()
     date_of_issue = models.DateField(auto_now_add=True)
     user_id = models.UUIDField(default=uuid4())
-    status = models.ForeignKey(Status, on_delete=models.PROTECT, default='new')
+    status = models.ForeignKey(Status, on_delete=models.PROTECT, default=1)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
