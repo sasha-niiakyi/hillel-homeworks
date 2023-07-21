@@ -1,0 +1,46 @@
+{% extends 'cards/base.html' %}
+
+{% block form %}
+
+<form action="{% url 'show_card' %}" method="get">
+	<p>
+		<span>Номер картки:</span>
+		<input placeholder="1111222233334444" type='text' name='number' value="">
+	</p>
+	<button type="submit">Отримати</button>
+</form>
+
+{% endblock form %}
+
+{% block content %}
+
+{% if card %}
+	<div class="show">
+		<p>
+			<span>Номер картки: </span>{{ card.number }}
+		</p>
+		<p>
+			<span>Закінчення сроку: </span>{{ card.expir_date|date:"j / y"}}
+		</p>
+		<p>
+			<span>CVV код: </span>{{ card.cvv }}
+		</p>
+		<p>
+			<span>Дата видачі: </span>{{ card.date_of_issue }}
+		</p>
+		<p>
+			<span>id власника: </span><span class="user_id">{{ card.user_id }}</span>
+		</p>
+		<p>
+			<span>Статус: </span>{{ card.status }}
+		</p>
+	</div>
+{% else %}
+	<div class="error">
+		<p class="not_find">
+			<span class="text_error">Картку не знайдено</span>
+		</p>
+	</div>
+{% endif %}
+
+{% endblock content %}

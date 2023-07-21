@@ -1,0 +1,100 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #838996;
+}
+
+.conteiner {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 50px;
+  background-color: #d8e1fd;
+  border-radius: 20px;
+}
+
+p {
+  margin: 0 auto;
+  margin-bottom: 15px;
+  font-weight: bold;
+  margin-left: 30px;
+}
+
+span {
+  display: inline-block;
+  font-weight: bold;
+  width: 200px;
+}
+
+.user_id {
+  display: inline-block;
+  font-weight: bold;
+  width: 200px;
+}
+
+input {
+  width: 200px;
+  padding: 5px;
+  border: 1px solid #4EBDD4;
+  border-radius: 20px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  text-indent: 5px; /* Сдвиг текста внутри поля на 5 пикселей */
+}
+
+button[type="submit"] {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #4EBDD4;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transform: skew(-10deg); /* Поворот кнопки на -10 градусов */
+}
+
+button[type="submit"]:hover {
+  background-color: #6C4DC4;
+}
+
+.links {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.forwarding {
+  margin: 0;
+  margin-bottom: 15px;
+}
+
+.forwarding a {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  background-color: #4EBDD4;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.forwarding a:hover {
+  background-color: #6C4DC4;
+}
+
+.error {
+  padding: 30px 0 0 0;
+}
+
+.not_find {
+  margin: 0 auto;
+}
+
+.text_error {
+  padding: 0 0 0 150px;
+}
+
+.show {
+  padding: 20px 0 0 0;
+}
