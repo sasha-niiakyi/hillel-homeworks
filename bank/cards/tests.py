@@ -1,92 +1,295 @@
-from django.template.loader import render_to_string
-from django.test import TestCase
-from cards.models import Card
-from django.urls import reverse
 import json
 import uuid
 from datetime import datetime
 
+from django.contrib.auth.models import Permission, User
+from rest_framework.test import APITestCase
+from django.urls import reverse
 
-class CardsTest(TestCase):
-
-	def test_get_card(self):
-		# given
-		create_card = Card(number=1111222233334444, expir_date='2025-11-01', cvv=456)
-		create_card.save()
-
-		card = Card.objects.filter(number=1111222233334444).first()
-
-		url = reverse('show_card') + '?number=1111222233334444'
-
-		# when
-		response = self.client.get(url)
-
-		actual_template = 'cards/show.html'
-		data = {'title': 'Show card', 'card': card}
-
-		expected_result = render_to_string(actual_template, data)
-
-		# then
-		self.assertEquals(expected_result, response.content.decode('utf-8'))
+from cards.models import Card, Status
+from cards.serializers import CardSerializer
 
 
-	def test_post_card(self):
-		# given
-		data = {"number": 1111222233334455,
-				"expir_date": "2025-11-01",
-				"cvv": 123,}
+class CardsTest(APITestCase):
 
-		url = reverse('create_card')
+	def test_APIList(self):
+		user = User.objects.create_user('testuser', password='test')
 
-		# when
-		response = self.client.post(url, data=data)
+		card = Card.objects.create(owner=user, number=1111_1111_1111_1111,
+									expir_date='2025-03-01', cvv=911)
 
-		# template
-		actual_template = 'cards/create.html'
-		context = {'title': 'Create card', 'check': False}
+		# add to db status
+		for s_id, stat in [(1, 'new'), (2, 'active'), (3, 'blocked'), (4, 'freeze')]:
+			status = Status(s_id, stat)
+			status.save()
 
-		expected_result = render_to_string(actual_template, context)
+		url = reverse('card-list')
 
-		# db
-		card = Card.objects.filter(number=1111222233334455).first()
+		expected_result = [
+			{
+				"number": card.number,
+				"name": card.name,
+				"expir_date": card.expir_date,
+				"cvv": card.cvv,
+				"date_of_issue": str(card.date_of_issue),
+				"user_id": str(card.user_id),
+				"status": card.status.id
+			}
+		]
 
-		expect_data = {"number": 1111222233334455,
-						"expir_date": "2025-11-01",
-						"cvv": 123,
-						'date_of_issue': str(datetime.now().date()), 
-						'user_id': True,
-						'status': 'new'}
+		self.client.login(username=user.username, password='test')
 
-		# then
-		self.assertEquals(expected_result, response.content.decode('utf-8'))
-		self.assertEquals(expect_data, {'number': card.number,
-										'expir_date': str(card.expir_date),
-										'cvv': card.cvv,
-										'date_of_issue': str(card.date_of_issue), 
-										'user_id': self.is_valid_uuid(str(card.user_id)),
-										'status': card.status})
+		response = self.client.get(url).json()
+
+		#create another user
+
+		user2 = User.objects.create_user('testuser2', password='test2')
+		self.client.login(username=user2.username, password='test2')
+		response2 = self.client.get(url).json()
+		expected_result2 = {
+				'error': 'You don`t have any cards'
+			}
+
+		self.assertEqual(
+			response,
+			expected_result
+		)
+		self.assertEqual(
+			response2,
+			expected_result2
+		)
+
+	def test_APICreate(self):
+		user = User.objects.create_user('testuser', password='test')
+
+		# add to db status
+		for i, j in [(1, 'new'), (2, 'active'), (3, 'blocked'), (4, 'freeze')]:
+			status = Status(i, j)
+			status.save()
+
+		url = reverse('card-list')
+
+		self.client.login(username=user.username, password='test')
+
+		data = {
+			"number": 1111_1111_1111_1111,
+			"expir_date": "2025-03-01",
+			"cvv": 911
+		}
+
+		response = self.client.post(url, data=data).json()
+
+		expected_result = response | {'owner': user.id}
+
+		card = Card.objects.filter(number=data['number']).first()
+
+		result = CardSerializer(card).data | {'owner': card.owner.id}
+
+		#create anonimus
+		#second test
+		self.client.force_authenticate(user=None)
+		response2 = self.client.post(url, data=data).json()
+		expected_result2 = {
+			"detail": "Authentication credentials were not provided."
+		}
+
+		self.assertEqual(
+			result,
+			expected_result
+		)
+		self.assertEqual(
+			response2,
+			expected_result2
+		)
 
 
-	def test_is_valid_false(self):
-		card = Card(number=1111222233334443, expir_date='2025-11-01', cvv=456)
+	def test_APIDetail(self):
+		user = User.objects.create_user('testuser', password='test')
+		user2 = User.objects.create_user('testuser2', password='test2')
 
-		result = card.is_valid()
-		self.assertEquals(result, False)
+		card = Card.objects.create(owner=user, number=1111_1111_1111_1111,
+									expir_date='2025-03-01', cvv=911)
+
+		# add to db status
+		for s_id, stat in [(1, 'new'), (2, 'active'), (3, 'blocked'), (4, 'freeze')]:
+			status = Status(s_id, stat)
+			status.save()
+
+		url = reverse('card-detail', args=[card.number])
+
+		expected_result = {
+			"number": card.number,
+			"name": card.name,
+			"expir_date": card.expir_date,
+			"cvv": card.cvv,
+			"date_of_issue": str(card.date_of_issue),
+			"user_id": str(card.user_id),
+			"status": card.status.id
+		}
+
+		self.client.login(username=user.username, password='test')
+
+		response = self.client.get(url).json()
+
+		#second test
+		self.client.login(username=user2.username, password='test2')
+		response2 = self.client.get(url).json()
+		expected_result2 = {
+			"detail": "You do not have permission to perform this action."
+		}
+
+		self.assertEqual(
+			response,
+			expected_result
+		)
+		self.assertEqual(
+			response2,
+			expected_result2
+		)
 
 
-	def test_is_valid_true(self):
-		card = Card(number=2000000000000006, expir_date='2025-11-01', cvv=456)
+	def test_APIUpdate(self):
+		user = User.objects.create_user('testuser', password='test')
+		user2 = User.objects.create_user('testuser2', password='test2')
 
-		result = card.is_valid()
-		self.assertEquals(result, True)
+		card = Card.objects.create(owner=user, number=1111_1111_1111_1111,
+									expir_date='2025-03-01', cvv=911)
+
+		# add to db status
+		for s_id, stat in [(1, 'new'), (2, 'active'), (3, 'blocked'), (4, 'freeze')]:
+			status = Status(s_id, stat)
+			status.save()
+
+		url = reverse('card-detail', args=[card.number])
+
+		data = {
+			"name": "monobank",
+			"cvv": 102
+		}
+
+		expected_result = {
+			"number": card.number,
+			"name": data['name'],
+			"expir_date": card.expir_date,
+			"cvv": data['cvv'],
+			"date_of_issue": str(card.date_of_issue),
+			"user_id": str(card.user_id),
+			"status": card.status.id
+		}
+
+		self.client.login(username=user.username, password='test')
+
+		response = self.client.patch(url, data=data).json()
+
+		card = Card.objects.filter(number=1111_1111_1111_1111).first()
+
+		result = CardSerializer(card).data
 
 
-	def is_valid_uuid(self, check_uuid: str):
-		try:
-			uuid_obj = uuid.UUID(check_uuid)
-			is_valid_uuid = True
-		except ValueError:
-			is_valid_uuid = False
+		#second test
+		self.client.login(username=user2.username, password='test2')
+		response2 = self.client.patch(url, data=data).json()
+		expected_result2 = {
+			"detail": "You do not have permission to perform this action."
+		}
 
-		return is_valid_uuid
+		self.assertEqual(
+			result,
+			expected_result
+		)
+		self.assertEqual(
+			response2,
+			expected_result2
+		)
 
+
+	def test_APIFreeze(self):
+		user = User.objects.create_user('testuser', password='test')
+		user2 = User.objects.create_user('testuser2', password='test2')
+
+		card = Card.objects.create(owner=user, number=1111_1111_1111_1111,
+									expir_date='2025-03-01', cvv=911)
+
+		# add to db status
+		for s_id, stat in [(1, 'new'), (2, 'active'), (3, 'blocked'), (4, 'freeze')]:
+			status = Status(s_id, stat)
+			status.save()
+
+		url = reverse('card-freeze', args=[card.number])
+
+		expected_result = {
+			"number": card.number,
+			"name": card.name,
+			"expir_date": card.expir_date,
+			"cvv": card.cvv,
+			"date_of_issue": str(card.date_of_issue),
+			"user_id": str(card.user_id),
+			"status": 4
+		}
+
+		self.client.login(username=user.username, password='test')
+		response = self.client.get(url).json()
+
+		card = Card.objects.filter(number=1111_1111_1111_1111).first()
+		result = CardSerializer(card).data
+
+
+		#second test
+		self.client.login(username=user2.username, password='test2')
+		response2 = self.client.get(url).json()
+		expected_result2 = {'error': 'It`s not your object'}
+
+		self.assertEqual(
+			result,
+			expected_result
+		)
+		self.assertEqual(
+			response2,
+			expected_result2
+		)
+
+
+	def test_APIReactivate(self):
+		user = User.objects.create_user('testuser', password='test')
+		user2 = User.objects.create_user('testuser2', password='test2')
+
+		card = Card.objects.create(owner=user, number=1111_1111_1111_1111,
+									expir_date='2025-03-01', cvv=911)
+
+		# add to db status
+		for s_id, stat in [(1, 'new'), (2, 'active'), (3, 'blocked'), (4, 'freeze')]:
+			status = Status(s_id, stat)
+			status.save()
+
+		url = reverse('card-reactivate', args=[card.number])
+
+		expected_result = {
+			"number": card.number,
+			"name": card.name,
+			"expir_date": card.expir_date,
+			"cvv": card.cvv,
+			"date_of_issue": str(card.date_of_issue),
+			"user_id": str(card.user_id),
+			"status": 2
+		}
+
+		self.client.login(username=user.username, password='test')
+		response = self.client.get(url).json()
+
+		card = Card.objects.filter(number=1111_1111_1111_1111).first()
+		result = CardSerializer(card).data
+
+
+		#second test
+		self.client.login(username=user2.username, password='test2')
+		response2 = self.client.get(url).json()
+		expected_result2 = {'error': 'It`s not your object'}
+
+		self.assertEqual(
+			result,
+			expected_result
+		)
+		self.assertEqual(
+			response2,
+			expected_result2
+		)
