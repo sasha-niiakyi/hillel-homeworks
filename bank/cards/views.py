@@ -1,11 +1,15 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
-from .models import Card, Status
 from .serializers import CardSerializer, CardSerializerUpdate
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+
+from .models import Card, Status
+from .permissions import IsOwner
 
 
 class CardsViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsOwner, IsAuthenticated]
     queryset = Card.objects.all()
     serializer_class = CardSerializer
 
@@ -27,7 +31,7 @@ class CardsViewSet(viewsets.ModelViewSet):
         return Response({"error": "You don`t have any cards"})
 
 
-    @action(methods=['get'], detail=True)
+    @action(methods=['get'], detail=True, permission_classes=[IsOwner, IsAuthenticated])
     def freeze(self, request, pk=None):
         if not pk:
             Response({'error': 'You need to enter a pk'})
@@ -37,13 +41,16 @@ class CardsViewSet(viewsets.ModelViewSet):
         except:
             Response({'error': 'The object doesn`t exist'})
 
+        if not (request.user.is_authenticated and request.user == card.owner):
+            return Response({'error': 'It`s not your object'})
+
         card.status = Status.objects.get(pk=4)
         card.save()
 
         return Response(CardSerializer(card).data)
 
 
-    @action(methods=['get'], detail=True)
+    @action(methods=['get'], detail=True, permission_classes=[IsOwner, IsAuthenticated])
     def reactivate(self, request, pk=None):
         if not pk:
             Response({'error': 'You need to enter a pk'})
@@ -52,6 +59,9 @@ class CardsViewSet(viewsets.ModelViewSet):
             card = Card.objects.get(pk=pk)
         except:
             Response({'error': 'The object doesn`t exist'})
+
+        if not (request.user.is_authenticated and request.user == card.owner):
+            return Response({'error': 'It`s not your object'})
 
         card.status = Status.objects.get(pk=2)
         card.save()
