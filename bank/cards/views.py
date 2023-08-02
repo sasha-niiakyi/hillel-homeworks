@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Card, Status
 from .permissions import IsOwner
+from .tasks import activate
 
 
 class CardsViewSet(viewsets.ModelViewSet):
@@ -63,7 +64,7 @@ class CardsViewSet(viewsets.ModelViewSet):
         if not (request.user.is_authenticated and request.user == card.owner):
             return Response({'error': 'It`s not your object'})
 
-        card.status = Status.objects.get(pk=2)
-        card.save()
-
-        return Response(CardSerializer(card).data)
+        activate.apply_async(args=[int(pk)])
+        
+        #CardSerializer(card).data
+        return Response({'Warning': 'Status will be changed in 2 minutes'})
