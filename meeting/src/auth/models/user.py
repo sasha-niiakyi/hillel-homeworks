@@ -1,4 +1,5 @@
 from uuid import uuid4
+import json
 import sys
 sys.path.append(sys.path[0] + '/../../..')
 
@@ -17,7 +18,25 @@ class User(Base):
 	hashed_password = Column(String, nullable=False)
 	is_active = Column(Boolean(), default=True) # it`ll be checked later
 
-	# def __repr__(self) -> str:
-	# 	return f"User(id={self.id!r}, name={self.name!r}, email={self.email!r})"
+	def __repr__(self) -> str:
+		return f"User(id={self.id!r}, name={self.name!r}, email={self.email!r})"
 
-	def json(self) -> 
+	def convert_json(self):
+		user_data = {
+			"id": str(self.id),
+			"name": self.name,
+			"last_name": self.last_name,
+			"email": self.email,
+			"is_active": self.is_active,
+		}
+		return json.dumps(user_data)
+
+	def as_dict(self):
+		user_data = {
+			"id": str(self.id),
+			"name": self.name,
+			"last_name": self.last_name,
+			"email": self.email,
+			"is_active": self.is_active,
+		}
+		return user_data

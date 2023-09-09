@@ -6,12 +6,13 @@ from pydantic import BaseModel, EmailStr
 
 
 class UserRead(BaseModel):
+	id: UUID
 	name: str
 	last_name: str
 	email: EmailStr
 	is_active: bool
 
-	class Config:
+	class ConfigDict:
 		'For Pydentic to convert everything to json'
 
 		from_attributes  = True

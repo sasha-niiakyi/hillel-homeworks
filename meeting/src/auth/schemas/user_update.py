@@ -2,17 +2,19 @@ from uuid import UUID
 from typing import Optional
 import sys
 sys.path.append(sys.path[0] + '/..')
+sys.path.append(sys.path[0] + '/../..')
 
 from pydantic import BaseModel, EmailStr, field_validator, Field
 
-from utils import password_validator
+from src.auth.utils import password_validator, name_validator
 
 
 class UserUpdate(BaseModel):
-	name: Optional[str]
-	last_name: Optional[str]
+	name: Optional[str] = None
+	last_name: Optional[str] = None
 	email: Optional[EmailStr] = Field(max_length=50, default=None)
-	password: Optional[str]
+	password: Optional[str] = None
+	is_active: Optional[bool] = None
 
 	@field_validator('name')
 	def validate_name(cls, name: str) -> str:
@@ -27,3 +29,12 @@ class UserUpdate(BaseModel):
 			raise HTTPException(status_code=422, detail={'status': 'error',
 														'data': inf})
 		return password
+
+	def as_dict(self):
+		user_data = {
+			"name": self.name,
+			"last_name": self.last_name,
+			"email": self.email,
+			"is_active": self.is_active,
+		}
+		return user_data

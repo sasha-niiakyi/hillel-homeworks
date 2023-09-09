@@ -11,6 +11,7 @@ sqlalchemy = "*"
 alembic = "*"
 pytest = "*"
 pytest-asyncio = "*"
+black = "*"
 
 [dev-packages]
 

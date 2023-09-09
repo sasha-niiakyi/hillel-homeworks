@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from passlib.context import CryptContext
 import os
 
 
@@ -18,3 +19,5 @@ DB_PASS_TEST = os.environ.get('DB_PASS_TEST')
 
 DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 DATABASE_URL_TEST = f"postgresql+asyncpg://{DB_USER_TEST}:{DB_PASS_TEST}@{DB_HOST_TEST}/{DB_NAME_TEST}"
+
+password_hasher = CryptContext(schemes=["bcrypt"], deprecated="auto")
