@@ -5,8 +5,8 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from .models import User
-from .schemas import UserCreate, UserRead, UserUpdate
+from src.auth.models import User
+from src.auth.schemas import UserCreate, UserRead, UserUpdate, UserLogin
 from src.config import password_hasher
 
 class UserCRUD:
@@ -86,7 +86,14 @@ class UserCRUD:
 
 
 	async def check_email(self, email: str) -> bool:
-		user = await self.session.get_user_by_email(user)
+		user = await self.get_user_by_email(email)
 		return bool(user)
 
+
+	async def auth_user(self, user_log: UserLogin) -> bool:
+		user = await self.get_user_by_email(user_log.email)
+		if user:
+			return password_hasher.verify(user_log.password, user.hashed_password)
+		else:
+			False
 
