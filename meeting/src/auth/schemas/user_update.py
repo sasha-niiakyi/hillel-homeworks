@@ -14,7 +14,6 @@ class UserUpdate(BaseModel):
 	last_name: Optional[str] = None
 	email: Optional[EmailStr] = Field(max_length=50, default=None)
 	password: Optional[str] = None
-	is_active: Optional[bool] = None
 
 	@field_validator('name')
 	def validate_name(cls, name: str) -> str:
@@ -35,6 +34,5 @@ class UserUpdate(BaseModel):
 			"name": self.name,
 			"last_name": self.last_name,
 			"email": self.email,
-			"is_active": self.is_active,
 		}
 		return user_data

@@ -17,7 +17,7 @@ def create_jwt_token(email: EmailStr):
     return token
 
 
-def verify_jwt_token(token: str):
+def decode_jwt_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload

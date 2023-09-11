@@ -10,7 +10,6 @@ class UserRead(BaseModel):
 	name: str
 	last_name: str
 	email: EmailStr
-	is_active: bool
 
 	class ConfigDict:
 		'For Pydentic to convert everything to json'

@@ -15,7 +15,6 @@ class UserCreate(BaseModel):
 	last_name: str
 	email: EmailStr = Field(max_length=50)
 	password: str
-	is_active: Optional[bool] = True
 
 	@field_validator('name')
 	def validate_name(cls, name: str) -> str:
@@ -36,6 +35,5 @@ class UserCreate(BaseModel):
 			"name": self.name,
 			"last_name": self.last_name,
 			"email": self.email,
-			"is_active": self.is_active,
 		}
 		return user_data

@@ -2,7 +2,6 @@ import sys
 
 sys.path.append(sys.path[0] + "/../..")
 from uuid import uuid4
-import json
 
 import pytest
 
@@ -26,7 +25,7 @@ async def test_create_user():
         user_id = await crud.create_user(user)
 
         saved_user = await session.get(User, user_id)
-        expect_result = {**{"id": str(user_id)}, **user.as_dict()}
+        expect_result = {**{"id": str(user_id)}, **user.as_dict(), "is_active": True}
 
         assert password_hasher.verify(user.password, saved_user.hashed_password)
         assert saved_user.as_dict() == expect_result
@@ -83,14 +82,12 @@ async def test_read_user(field):
                 "email": "shlyapa2@example.com",
                 "last_name": "Niy2",
                 "password": "password2",
-                "is_active": False,
             },
             {
                 "id": "f61b3a2b-d6dd-4c73-9c23-da0bce0fe133",
                 "name": "Sasha2",
                 "email": "shlyapa2@example.com",
                 "last_name": "Niy2",
-                "is_active": False,
             },
         ),
         (
@@ -100,14 +97,12 @@ async def test_read_user(field):
                 "email": "shlyapa2@example.com",
                 "last_name": "Niy2",
                 "password": "password2",
-                "is_active": False,
             },
             {
                 "id": "f61b3a2b-d6dd-4c73-9c23-da0bce0fe133",
                 "name": "Sasha2",
                 "email": "shlyapa2@example.com",
                 "last_name": "Niy2",
-                "is_active": False,
             },
         ),
     ],
@@ -135,9 +130,9 @@ async def test_update_user(field, update_data, result_data):
         if field == "id":
             up_user_id = await crud.update_user(id=user.id, data=new_user_data)
 
-            updated_user = await session.get(User, up_user_id)
+            updated_user = await session.get(User, user.id)
 
-            result_data = {**{"id": str(up_user_id)}, **new_user_data.as_dict()}
+            result_data = {**{"id": str(user.id)}, **new_user_data.as_dict(), "is_active": True}
 
             assert password_hasher.verify(new_user_data.password, updated_user.hashed_password)
             assert updated_user.as_dict() == result_data
@@ -145,9 +140,9 @@ async def test_update_user(field, update_data, result_data):
         elif field == "email":
             up_user_id = await crud.update_user(user_email=user.email, data=new_user_data)
 
-            updated_user = await session.get(User, up_user_id)
+            updated_user = await session.get(User, user.id)
 
-            result_data = {**{"id": str(up_user_id)}, **new_user_data.as_dict()}
+            result_data = {**{"id": str(user.id)}, **new_user_data.as_dict(), "is_active": True}
 
             assert password_hasher.verify(new_user_data.password, updated_user.hashed_password)
             assert updated_user.as_dict() == result_data
@@ -180,12 +175,12 @@ async def test_delete_user(field):
             deleted_user = await crud.delete_user(id=user.id)
 
             result = await session.get(User, user.id)
-            assert result == None
+            assert result.is_active == False
             assert deleted_user == user.id
 
         elif field == "email":
             deleted_user = await crud.delete_user(user_email=user.email)
 
             result = await session.get(User, user.email)
-            assert result == None
+            assert result.is_active == False
             assert deleted_user == user.id

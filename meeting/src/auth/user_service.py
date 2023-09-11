@@ -59,6 +59,9 @@ class UserCRUD:
 		else:
 			return None
 
+		if user is None:
+			return None
+
 		for key, value in data.as_dict().items():
 			if hasattr(user, key):
 				setattr(user, key, value)
@@ -80,9 +83,9 @@ class UserCRUD:
 		else:
 			return None
 
-		self.session.delete(user)
+		user.is_active = False
 		await self.session.commit()
-		return id
+		return user.id
 
 
 	async def check_email(self, email: str) -> bool:
