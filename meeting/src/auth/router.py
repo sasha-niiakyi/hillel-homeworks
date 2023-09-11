@@ -6,11 +6,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.responses import JSONResponse
 
-from src.auth.schemas import UserCreate, UserLogin
+from src.auth.schemas import UserCreate, UserLogin, UserRead
 from src.auth.user_service import UserCRUD
 from src.database import get_async_session
 from src.auth.jwt_utils import create_jwt_token
 from src.auth.dependencies import get_current_user
+from src.auth.permissions import is_owner
 
 
 user_router = APIRouter(
@@ -72,10 +73,8 @@ async def login_user(user_log: UserLogin,
 
 @user_router.get("/{user_email}")
 async def login_user(user_email: str,
-	current_user: str = Depends(get_current_user),
+	is_owner: bool = Depends(is_owner),
 	session: AsyncSession = Depends(get_async_session)
 ):
-	if current_user == user_email:
-		return current_user
-	else:
-		return "Wrong"
+	return is_owner
+
