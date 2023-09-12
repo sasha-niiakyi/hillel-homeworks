@@ -15,3 +15,12 @@ class UserRead(BaseModel):
 		'For Pydentic to convert everything to json'
 
 		from_attributes  = True
+
+	def as_dict(self):
+		user_data = {
+			"id": str(self.id),
+			"name": self.name,
+			"last_name": self.last_name,
+			"email": self.email,
+		}
+		return user_data

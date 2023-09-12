@@ -9,7 +9,7 @@ from tests.conftest import async_session_maker
 from src.config import password_hasher
 from src.auth.user_service import UserCRUD
 from src.auth.models import User
-from src.auth.schemas import UserCreate, UserUpdate
+from src.auth.schemas import UserCreate, UserUpdate, UserRead
 
 
 async def test_create_user():
@@ -184,3 +184,27 @@ async def test_delete_user(field):
             result = await session.get(User, user.email)
             assert result.is_active == False
             assert deleted_user == user.id
+
+
+async def test_get_users_is_active():
+    list_users = []
+    async with async_session_maker() as session:
+        for i in range(11):
+            user = User(
+                id=uuid4(),
+                name=f"Sasha{i}",
+                email=f"user{i}@gmail.com",
+                last_name=f"Niy{i}",
+                hashed_password=password_hasher.hash(f"password{i}"),
+            )
+            list_users.append(UserRead(**user.as_dict()))
+            session.add(user)
+
+        await session.commit()
+
+
+    async with async_session_maker() as session:
+        crud = UserCRUD(session)
+        users = await crud.get_users_is_active(offset=1)
+
+    assert list_users[:10] == users

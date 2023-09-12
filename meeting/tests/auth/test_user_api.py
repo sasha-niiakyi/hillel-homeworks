@@ -11,6 +11,7 @@ from src.config import password_hasher
 from src.auth.user_service import UserCRUD
 from tests.utils import is_valid_uuid
 from src.auth.models import User
+from src.auth.schemas import UserRead
 
 
 async def test_register_user(async_client: AsyncClient):
@@ -175,3 +176,29 @@ async def test_update_user_auth(async_client: AsyncClient):
 							"data": str(user.id),
 							"detail": None,
 							}
+
+
+async def test_get_users(async_client: AsyncClient):
+	list_users = []
+	async with async_session_maker() as session:
+		for i in range(11):
+			user = User(
+				id=uuid4(),
+				name=f"Sasha{i}",
+				email=f"user{i}@gmail.com",
+				last_name=f"Niy{i}",
+				hashed_password=password_hasher.hash(f"password{i}"),
+			)
+			list_users.append(UserRead(**user.as_dict()).as_dict())
+			session.add(user)
+
+		await session.commit()
+
+	response = await async_client.get(
+		f"/user/show/1",
+		headers=create_test_auth_headers_for_user("user0@gmail.com"),
+	)
+
+	assert response.json() == list_users[:10]
+
+

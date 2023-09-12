@@ -1,5 +1,9 @@
+import sys
+sys.path.append(sys.path[0] + '/..')
+
 from fastapi import FastAPI
-from auth.router import user_router, login_router
+
+from src.auth.router import user_router, login_router
 
 
 app = FastAPI(

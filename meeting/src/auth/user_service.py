@@ -1,6 +1,7 @@
 import sys
 sys.path.append(sys.path[0] + '/../..')
-from uuid import UUID
+from uuid import UUID, uuid4
+from typing import List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -26,6 +27,7 @@ class UserCRUD:
 		user: UserCreate
 	) -> UUID:
 		create_user = User(
+			id=uuid4(),
 			name=user.name,
 			last_name=user.last_name,
 			email=user.email,
@@ -99,4 +101,19 @@ class UserCRUD:
 			return password_hasher.verify(user_log.password, user.hashed_password)
 		else:
 			False
+
+
+	async def get_users_is_active(self, offset: int, limit: int = 10) -> List[UserRead]:
+		if offset > 1:
+			offset = (offset - 1) * limit
+		else:
+			offset = 0
+
+		query = select(User).where(User.is_active == True).offset(offset).limit(limit)
+		request_users = await self.session.execute(query)
+		users = request_users.scalars().all()
+
+		result = [UserRead(**user.as_dict()) for user in users]
+		
+		return result
 

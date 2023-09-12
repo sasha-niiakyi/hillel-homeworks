@@ -107,3 +107,15 @@ async def delete_user(
 		"detail": None,
 	})
 	return response
+
+
+@user_router.get('/show/{page}')
+async def show_users(
+	page: int,
+	user_email: str = Depends(get_current_user),
+	session: AsyncSession = Depends(get_async_session),
+):
+	crud = UserCRUD(session)
+	users = await crud.get_users_is_active(offset=page)
+
+	return users
