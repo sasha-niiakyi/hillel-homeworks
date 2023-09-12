@@ -12,6 +12,7 @@ from src.auth.models import User
 from src.database import get_async_session
 from src.main import app
 from src.config import DATABASE_URL_TEST
+from src.auth.jwt_utils import create_jwt_token
 
 
 engine_test = create_async_engine(DATABASE_URL_TEST)
@@ -43,6 +44,11 @@ def event_loop(request):
 
 
 @pytest.fixture(scope="session")
-async def ac() -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+async def async_client() -> AsyncGenerator[AsyncClient, None]:
+    async with AsyncClient(app=app, base_url="http://test", follow_redirects = True) as ac:
         yield ac
+
+
+def create_test_auth_headers_for_user(email: str):
+    access_token = create_jwt_token(email)
+    return {"Authorization": f"Bearer {access_token}"}
