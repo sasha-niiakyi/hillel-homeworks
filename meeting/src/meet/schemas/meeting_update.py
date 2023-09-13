@@ -2,12 +2,12 @@ from uuid import UUID
 from typing import Optional
 from datetime import datetime as datetime_type
 import sys
-sys.path.append(sys.path[0] + '/..')
+sys.path.append(sys.path[0] + '/../..')
 
 from pydantic import BaseModel, field_validator, Field
 from fastapi import HTTPException
 
-from utils import datetime_validator
+from src.meet.utils import datetime_validator
 
 
 class MeetingUpdate(BaseModel):

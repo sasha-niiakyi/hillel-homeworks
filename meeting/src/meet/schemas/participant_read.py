@@ -8,6 +8,7 @@ from pydantic import BaseModel
 class ParticipantRead(BaseModel):
 	user_id: UUID
 	meeting_id: UUID
+	is_owner: bool
 
 	class Config:
 		'For Pydentic to convert everything to json'

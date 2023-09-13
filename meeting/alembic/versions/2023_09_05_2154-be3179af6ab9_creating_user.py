@@ -1,4 +1,3 @@
-from uuid import uuid4
 """Creating User
 
 Revision ID: be3179af6ab9
@@ -7,6 +6,7 @@ Create Date: 2023-09-05 21:54:50.410997
 
 """
 from typing import Sequence, Union
+from uuid import uuid4
 
 from alembic import op
 import sqlalchemy as sa
