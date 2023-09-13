@@ -18,3 +18,12 @@ class Meeting(Base):
 
 	def __repr__(self) -> str:
 		return f"Meeting(id={self.id!r}, place={self.place!r}, datetime={self.datetime!r})"
+
+
+	def as_dict(self):
+		return {
+			"id": self.id,
+			"place": self.place,
+			"datetime": self.datetime,
+			"is_active": self.is_active,
+		}

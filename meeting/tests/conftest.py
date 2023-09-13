@@ -13,6 +13,7 @@ from src.database import get_async_session
 from src.main import app
 from src.config import DATABASE_URL_TEST
 from src.auth.jwt_utils import create_jwt_token
+from src.meet.models import Meeting, Participant
 
 
 engine_test = create_async_engine(DATABASE_URL_TEST)
@@ -29,9 +30,13 @@ User.metadata.bind = engine_test
 async def prepare_database():
     async with engine_test.begin() as conn:
         await conn.run_sync(User.metadata.create_all)
+        await conn.run_sync(Meeting.metadata.create_all)
+        await conn.run_sync(Participant.metadata.create_all)
     yield
     async with engine_test.begin() as conn:
         await conn.run_sync(User.metadata.drop_all)
+        await conn.run_sync(Meeting.metadata.drop_all)
+        await conn.run_sync(Participant.metadata.drop_all)
 
 
 # SETUP

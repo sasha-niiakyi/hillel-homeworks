@@ -10,7 +10,7 @@ class ParticipantRead(BaseModel):
 	meeting_id: UUID
 	is_owner: bool
 
-	class Config:
+	class ConfigDict:
 		'For Pydentic to convert everything to json'
 
 		from_attributes  = True

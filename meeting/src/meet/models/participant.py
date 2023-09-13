@@ -19,3 +19,11 @@ class Participant(Base):
 
 	def __repr__(self) -> str:
 		return f"Participant(id={self.id!r}, user={self.user_id!r}, meeting={self.meeting_id!r}, is_owner={self.is_owner!r})"
+
+	def as_dict(self):
+		return {
+			"id": self.id,
+			"user_id": self.user_id,
+			"meeting_id": self.meeting_id,
+			"is_owner": self.is_owner,
+		}
