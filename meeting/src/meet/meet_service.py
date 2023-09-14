@@ -65,23 +65,26 @@ class MeetingCRUD:
 		return create_meeting.id
 
 
-	async def read_meeting(self, meeting_id: UUID) -> MeetingRead:
+	async def read_meeting(self, meeting_id: UUID) -> [MeetingRead, None]:
 		meeting = await self.session.get(Meeting, meeting_id)
 
-		query = select(Participant.user_id).where(Participant.meeting_id == meeting_id)
-		request_participants = await self.session.execute(query)
-		users_id = request_participants.fetchall()
+		if meeting:
+			query = select(Participant.user_id).where(Participant.meeting_id == meeting_id)
+			request_participants = await self.session.execute(query)
+			users_id = request_participants.fetchall()
 
-		participants = []
-		for id in users_id:
-			user = await self.session.get(User, id)
-			participants.append(UserRead(**user.as_dict()))
+			participants = []
+			for id in users_id:
+				user = await self.session.get(User, id)
+				participants.append(UserRead(**user.as_dict()))
 
-		read_meeting = MeetingRead(
-			place=meeting.place,
-			datetime=meeting.datetime,
-			participants=participants,
-		)
+			read_meeting = MeetingRead(
+				place=meeting.place,
+				datetime=meeting.datetime,
+				participants=participants,
+			)
+		else:
+			read_meeting = None
 
 		return read_meeting
 
@@ -92,7 +95,7 @@ class MeetingCRUD:
 		else:
 			offset = 0
 
-		query = select(Meetin).offset(offset).limit(limit)
+		query = select(Meeting).offset(offset).limit(limit)
 		request_meetings = await self.session.execute(query)
 		meetings = request_meetings.scalars().all()
 
@@ -105,8 +108,12 @@ class MeetingCRUD:
 		return bool(await self.session.scalar(query))
 
 
-	async def update_meeting(self, meeting_id: UUID, data: MeetingUpdate) -> UUID:
+	async def update_meeting(self, meeting_id: UUID, data: MeetingUpdate) -> [UUID, None]:
 		meeting = await self.session.get(Meeting, meeting_id)
+
+		if not meeting:
+			return None
+
 		user_worker = UserCRUD(self.session)
 
 		if data.place:
@@ -130,6 +137,25 @@ class MeetingCRUD:
 
 		await self.session.commit()
 		return meeting.id
+
+
+	async def get_participant(self, meeting_id: UUID, user_email: str):
+		user_worker = UserCRUD(self.session)
+		user = await user_worker.get_user_by_email(user_email)
+
+		if not user:
+			return None
+
+		query = select(Participant).where(
+			Participant.meeting_id == meeting_id,
+			Participant.user_id == user.id
+		)
+		participant = await self.session.scalar(query)
+
+		if not participant:
+			return None
+
+		return participant
 
 
 
