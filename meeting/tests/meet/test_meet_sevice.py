@@ -5,7 +5,7 @@ from uuid import uuid4
 import pytest
 from sqlalchemy import select
 
-from tests.conftest import async_session_maker
+from tests.conftest import async_session_maker, create_users, get_participants
 from src.auth.user_service import UserCRUD
 from src.auth.schemas import UserRead
 from src.auth.models import User
@@ -17,19 +17,7 @@ from src.config import password_hasher
 
 
 async def test_create_meeting():
-	users = []
-	async with async_session_maker() as session:
-		for i in range(3):
-			user = User(
-				id=uuid4(),
-				name=f"Sasha{i}",
-				email=f"user{i}@gmail.com",
-				last_name=f"Niy{i}",
-				hashed_password=password_hasher.hash(f"password{i}"),
-			)
-			users.append(user)
-			session.add(user)
-		await session.commit()
+	users = await create_users(number=3)
 
 	meeting = MeetingCreate(
 		place="Odesa",
@@ -42,17 +30,7 @@ async def test_create_meeting():
 		meeting_id = await worker.create_meeting(meeting, users[0].email)
 
 		saved_meeting = await session.get(Meeting, meeting_id)
-		query = select(Participant).where(Participant.meeting_id == meeting_id)
-		request_participants = await session.execute(query)
-		saved_participants = request_participants.scalars().all()
-
-		result_participants = []
-		for participant in saved_participants:
-			assert is_valid_uuid(str(participant.id))
-
-			pat_dict = participant.as_dict()
-			del pat_dict["id"]
-			result_participants.append(pat_dict)
+		result_participants = await get_participants(meeting_id)
 
 		expect_participants = []
 		for user in users:
@@ -82,20 +60,9 @@ async def test_create_meeting():
 
 
 async def test_read_meeting():
-	users = []
-	async with async_session_maker() as session:
-		for i in range(3):
-			user = User(
-				id=uuid4(),
-				name=f"Sasha{i}",
-				email=f"user{i}@gmail.com",
-				last_name=f"Niy{i}",
-				hashed_password=password_hasher.hash(f"password{i}"),
-			)
-			users.append(user)
-			session.add(user)
-		await session.commit()
+	users = await create_users(number=3)
 
+	async with async_session_maker() as session:
 		meet_schema = MeetingCreate(
 			place="Odesa",
 			datetime="2023-09-17 17:30",
@@ -151,19 +118,9 @@ async def test_read_meeting():
 
 
 async def test_update_meeting():
-	users = []
-	async with async_session_maker() as session:
-		for i in range(2):
-			user = User(
-				id=uuid4(),
-				name=f"Sasha{i}",
-				email=f"user{i}@gmail.com",
-				last_name=f"Niy{i}",
-				hashed_password=password_hasher.hash(f"password{i}"),
-			)
-			users.append(user)
-			session.add(user)
+	users = await create_users(number=2)
 
+	async with async_session_maker() as session:
 		meet_schema = MeetingCreate(
 			place="Odesa",
 			datetime="2023-09-17 17:30",
@@ -203,17 +160,7 @@ async def test_update_meeting():
 
 
 		updated_meeting = await session.get(Meeting, meeting.id)
-		query = select(Participant).where(Participant.meeting_id == meeting.id)
-		request_participants = await session.execute(query)
-		saved_participants = request_participants.scalars().all()
-
-		result_participants = []
-		for participant in saved_participants:
-			assert is_valid_uuid(str(participant.id))
-
-			pat_dict = participant.as_dict()
-			del pat_dict["id"]
-			result_participants.append(pat_dict)
+		result_participants = await get_participants(meeting.id)
 
 		expect_participants = []
 		for user in users:

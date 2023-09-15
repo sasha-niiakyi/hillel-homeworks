@@ -11,6 +11,6 @@ from src.meet.utils import datetime_validator
 
 
 class MeetingCreate(BaseModel):
-	place: str = Field(str, max_length=100)
+	place: str = Field(max_length=100)
 	datetime: datetime_type
 	participants: Optional[List[EmailStr]] = []

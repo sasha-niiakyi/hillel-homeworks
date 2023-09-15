@@ -12,5 +12,5 @@ from src.meet.utils import datetime_validator
 
 class MeetingUpdate(BaseModel):
 	place: Optional[str] = Field(max_length=100, default=None)
-	datetime: Optional[datetime_type]
+	datetime: Optional[datetime_type] = None
 	participants: Optional[List[EmailStr]] = []
