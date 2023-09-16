@@ -35,7 +35,7 @@ class CommentCRUD:
 			create_comment = Comment(
 				id=uuid4(),
 				participant_id=participant.id,
-				created_at=data.created_at,
+				created_at=datetime.now(),
 				comment=data.comment
 			)
 
@@ -83,7 +83,6 @@ class CommentCRUD:
 		comment_id: UUID,
 		data: CommentUpdate,
 	):
-		worker = CommentCRUD(self.session)
 		comment = await self.session.get(Comment, comment_id)
 
 		if comment:
@@ -94,3 +93,26 @@ class CommentCRUD:
 
 		else:
 			return None
+
+
+	async def delete_comment(
+		self,
+		comment_id: UUID
+	):
+		comment = await self.session.get(Comment, comment_id)
+
+		if comment:
+			await self.session.delete(comment)
+			await self.session.commit()	
+
+			return comment.id
+
+		else:
+			return None
+
+	async def get_user_from_comment(self, comment_id: UUID):
+		comment = await self.session.get(Comment, comment_id)
+		participant = await self.session.get(Participant, comment.participant_id)
+		user = await self.session.get(User, participant.user_id)
+
+		return user

@@ -35,7 +35,9 @@ async def test_create_comment():
 		created_meeting_id = await meeting_worker.create_meeting(add_data, users[0].email)
 		participant = await meeting_worker.get_participant(created_meeting_id, users[0].email)
 
-	data = CommentCreate(comment="Hello", created_at=datetime.now())
+	start = datetime.now()
+
+	data = CommentCreate(comment="Hello")
 
 	async with async_session_maker() as session:
 		worker = CommentCRUD(session)
@@ -44,7 +46,7 @@ async def test_create_comment():
 		result_comment = await session.get(Comment, created_comment_id)
 
 		assert result_comment.participant_id == participant.id
-		assert result_comment.created_at == data.created_at
+		assert start <result_comment.created_at < datetime.now()
 		assert result_comment.comment == data.comment
 
 

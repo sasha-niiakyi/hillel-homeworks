@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from src.auth.router import user_router, login_router
 from src.meet.routers import meet_router
 from src.check.routers import purchase_router
+from src.comment.routers import comment_router
 
 
 app = FastAPI(
@@ -16,3 +17,4 @@ app.include_router(user_router)
 app.include_router(login_router)
 app.include_router(meet_router)
 app.include_router(purchase_router)
+app.include_router(comment_router)

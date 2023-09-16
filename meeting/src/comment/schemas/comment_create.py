@@ -9,5 +9,4 @@ from fastapi import HTTPException
 
 
 class CommentCreate(BaseModel):
-	created_at: datetime_type = Field(default=datetime_type.now())
 	comment: str = Field(max_length=500)
