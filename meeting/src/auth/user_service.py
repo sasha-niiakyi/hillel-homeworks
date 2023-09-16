@@ -65,6 +65,8 @@ class UserCRUD:
 			return None
 
 		for key, value in data.model_dump().items():
+			if key == "email" and value is None:
+				continue
 			if hasattr(user, key):
 				setattr(user, key, value)
 
