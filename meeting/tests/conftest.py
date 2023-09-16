@@ -4,6 +4,7 @@ import sys
 sys.path.append(sys.path[0] + '/..')
 from uuid import uuid4, UUID
 from typing import List
+from datetime import datetime
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
@@ -17,10 +18,13 @@ from src.main import app
 from src.config import DATABASE_URL_TEST, password_hasher
 from src.auth.jwt_utils import create_jwt_token
 from src.meet.models import Meeting, Participant
+from src.meet.meet_service import MeetingCRUD
+from src.meet.schemas import MeetingCreate
 from src.auth.models import User
 from src.auth.user_service import UserCRUD
 from tests.utils import is_valid_uuid
 from src.check.models import Purchase
+from src.comment.models import Comment
 
 
 engine_test = create_async_engine(DATABASE_URL_TEST)
@@ -40,12 +44,14 @@ async def prepare_database():
         await conn.run_sync(Meeting.metadata.create_all)
         await conn.run_sync(Participant.metadata.create_all)
         await conn.run_sync(Purchase.metadata.create_all)
+        await conn.run_sync(Comment.metadata.create_all)
     yield
     async with engine_test.begin() as conn:
         await conn.run_sync(User.metadata.drop_all)
         await conn.run_sync(Meeting.metadata.drop_all)
         await conn.run_sync(Participant.metadata.drop_all)
         await conn.run_sync(Purchase.metadata.drop_all)
+        await conn.run_sync(Comment.metadata.drop_all)
 
 
 # SETUP
@@ -123,3 +129,35 @@ async def get_expect_participants(meeting_id: UUID, users: List[User]) -> List[U
                 )
 
         return expect_participants
+
+
+async def create_comment():
+    users = await create_users(number=2)
+
+    temp_data = {
+        "place": "Odesa",
+        "datetime": "2023-09-15 20:37",
+        "participants": [user.email for user in users[1:]],
+    }
+
+    add_data = MeetingCreate(**temp_data)
+
+    async with async_session_maker() as session:
+        meeting_worker = MeetingCRUD(session)
+        created_meeting_id = await meeting_worker.create_meeting(add_data, users[0].email)
+        participants = await meeting_worker.get_participants(created_meeting_id)
+
+        comments = []
+        for participant in participants:
+            comment = Comment(
+                id=uuid4(),
+                participant_id=participant.id,
+                created_at=datetime.now(),
+                comment='hello'
+            )
+            session.add(comment)
+            comments.append(comment)
+
+        await session.commit()
+
+        return comments

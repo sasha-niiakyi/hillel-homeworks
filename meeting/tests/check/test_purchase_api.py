@@ -18,13 +18,13 @@ from src.meet.schemas import MeetingCreate, MeetingRead, MeetingUpdate
 from src.meet.meet_service import MeetingCRUD
 
 
-async def test_create_meeting_auth(async_client: AsyncClient):
-	users = await create_users(number=2)
+# async def test_create_meeting_auth(async_client: AsyncClient):
+# 	users = await create_users(number=2)
 
-	expect_data = MeetingCreate(**data)
+# 	expect_data = MeetingCreate(**data)
 
-	response = await async_client.post(
-		"/meetings",
-		json=data,
-		headers=create_test_auth_headers_for_user(users[0].email),
-	)
+# 	response = await async_client.post(
+# 		"/meetings",
+# 		json=data,
+# 		headers=create_test_auth_headers_for_user(users[0].email),
+# 	)

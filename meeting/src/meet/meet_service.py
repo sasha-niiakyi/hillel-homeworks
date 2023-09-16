@@ -157,6 +157,19 @@ class MeetingCRUD:
 
 		return participant
 
+	async def get_participants(self, meeting_id: UUID):
+
+		query = select(Participant).where(
+			Participant.meeting_id == meeting_id
+		)
+		request_participants = await self.session.execute(query)
+		participants = request_participants.scalars().all()
+
+		if not participants:
+			return None
+
+		return participants
+
 
 
 
