@@ -112,7 +112,13 @@ class CommentCRUD:
 
 	async def get_user_from_comment(self, comment_id: UUID):
 		comment = await self.session.get(Comment, comment_id)
-		participant = await self.session.get(Participant, comment.participant_id)
-		user = await self.session.get(User, participant.user_id)
+		if comment:
+			participant = await self.session.get(Participant, comment.participant_id)
+			if participant:
+				user = await self.session.get(User, participant.user_id)
+			else:
+				return None
+		else:
+			return None
 
 		return user

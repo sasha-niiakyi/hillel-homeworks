@@ -92,10 +92,10 @@ async def test_read_meeting_auth(async_client: AsyncClient):
 		headers=create_test_auth_headers_for_user(users[0].email),
 	)
 
-	async with async_session_maker() as session:
-		response = response.json()
+	
+	response = response.json()
 
-		participants = [UserRead(**user.as_dict()).as_dict() for user in users]
+	participants = [UserRead(**user.as_dict()).as_dict() for user in users]
 
 		# expect_result = MeetingRead(
 		# 	place=expect_data.place,
@@ -103,10 +103,10 @@ async def test_read_meeting_auth(async_client: AsyncClient):
 		# 	participants=participants,
 		# )
 
-		expect_result = {
-			"place": expect_data.place,
-			"datetime": (data["datetime"].replace(' ', 'T') + ':00'),
-			"participants": participants
-		}
+	expect_result = {
+		"place": expect_data.place,
+		"datetime": (data["datetime"].replace(' ', 'T') + ':00'),
+		"participants": participants
+	}
 
-		assert response == expect_result
+	assert response == expect_result

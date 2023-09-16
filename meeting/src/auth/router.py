@@ -71,6 +71,12 @@ async def home_user(
 ):
 	crud = UserCRUD(session)
 	user = await crud.get_user_by_email(user_email)
+	if not user:
+		raise HTTPException(status_code=422, detail={
+			"status": "error",
+			"data": None,
+			"detail": "User not found",
+		})
 
 	response = UserRead(**user.as_dict())
 	return response

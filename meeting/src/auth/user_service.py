@@ -64,11 +64,9 @@ class UserCRUD:
 		if user is None:
 			return None
 
-		for key, value in data.as_dict().items():
+		for key, value in data.model_dump().items():
 			if hasattr(user, key):
 				setattr(user, key, value)
-			else:
-				return None
 
 		if data.password:
 			setattr(user, "hashed_password", password_hasher.hash(data.password))

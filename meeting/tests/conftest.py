@@ -161,3 +161,40 @@ async def create_comment():
         await session.commit()
 
         return comments
+
+
+async def create_ump():
+    '''Create user meeting participant'''
+    async with async_session_maker() as session:
+        user = User(
+            id=uuid4(),
+            name="Sasha",
+            last_name="Niy",
+            email="user@gmail.com",
+            hashed_password=password_hasher.hash("password1"),
+        )
+        session.add(user)
+
+        meet_data = MeetingCreate(
+            place="Odesa",
+            datetime="2023-09-15 20:37",
+            participants=[],
+        )
+
+        meeting = Meeting(
+            id=uuid4(),
+            place=meet_data.place,
+            datetime=meet_data.datetime,
+            is_active=True,
+        )
+        session.add(meeting)
+
+        participant = Participant(
+            id=uuid4(),
+            user_id=user.id,
+            meeting_id=meeting.id,
+            is_owner=True
+        )
+        session.add(participant)
+        await session.commit()
+    return (user, meeting, participant)

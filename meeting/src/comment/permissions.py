@@ -16,6 +16,9 @@ async def is_owner_comment(
     comment_id = request.path_params.get("comment_id")
     user = await worker.get_user_from_comment(comment_id)
 
+    if not user:
+        raise HTTPException(status_code=403, detail="Access denied, not the comment owner")
+
     if current_user_email == user.email:
         return user.email
     else:
